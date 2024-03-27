@@ -2,24 +2,51 @@ const express = require("express");
 const router = express.Router();
 const Post = require("../models/Post");
 
-router.get("/", (req, res) => {
-  res.send("& WE ARE ON POSTS");
+// GET POSTS
+router.get("/", async (req, res) => {
+  try {
+    const posts = await Post.find();
+    res.json(posts);
+  } catch (err) {
+    res.json({ message: err });
+  }
 });
 
-router.post("/", (req, res) => {
+//SUBMIT THE POST
+router.post("/", async (req, res) => {
   const post = new Post({
     title: req.body.title,
     description: req.body.description,
   });
 
-  post
-    .save()
-    .then((data) => {
-      res.json(data);
-    })
-    .catch((err) => {
-      res.json({ message: err });
+  try {
+    const savedPost = await post.save();
+    res.json(savedPost);
+  } catch (err) {
+    res.json({ message: err });
+  }
+});
+
+// SPECIFIC POST
+router.get("/:postId", async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.postId);
+    res.json(post);
+  } catch (err) {
+    res.json({ message: err });
+  }
+});
+
+// DELETE
+router.delete("/:postId", async (req, res) => {
+  try {
+    const removedPost = await Post.deleteOne({
+      _id: req.params.postId,
     });
+    res.json(removedPost);
+  } catch (err) {
+    res.json({ message: err });
+  }
 });
 
 module.exports = router;
